@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="canvas" width="600" height="600"
+style="background-color:#333" onclick="onClick()">
+</canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let radius = canvas.height / 2;
+const States = Object.freeze({
+    sleep: 0,
+    exercise: 1,
+	pause: 2,
+    timer: 3,
+	alarm: 4
+});
+let state = States.sleep;
+let alarmOn = false;
+let exerOn = false;
+let alarmTime = new Date;
+let exerTime  = new Date;
+let position  = 0;
+let repCount  = 0;
+let transistion = 0;
+const numExer = 5;
+const numReps = 10;
+
+ctx.translate(radius, radius);
+radius = radius * 0.90
+setInterval(onTick, 1000);
+
+/*
+var mySound = new sound("bounce.mp3");
+
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
+*/
+
+function setExer() {
+  const now = new Date();
+  exerTime.setHours( now.getHours() );
+  exerTime.setMinutes( now.getMinutes() );
+  exerTime.setSeconds( now.getSeconds() + 10 );
+  state = States.exercise;
+  Exercise = 0;
+  Rep = 0;
+  transistion = 0;
+}
+
+function clearExer() {
+}
+
+function setTimer() {
+  const now = new Date();
+  alarmTime.setHours( now.getHours() + 2 );
+  alarmTime.setMinutes( now.getMinutes() );
+  alarmTime.setSeconds( now.getSeconds() );
+  state = States.timer;
+}
+
+function clearTimer() {
+}
+
+function onClick() {
+
+  switch( state )
+  {
+  case States.sleep:
+	{
+		setExer();
+	}
+	break;
+  case States.exercise:
+    {
+		setTimer();
+	}
+	break;
+  case States.timer:
+    state = States.alarm;
+    break;
+  case States.alarm:
+    state = States.pause;
+    break;
+  case States.pause:
+    state = States.sleep;
+	break;
+  }
+  
+  exerOn  = (state == States.exercise);
+  alarmOn = (state == States.timer);
+}
+
+function onTick() {
+  const now = new Date();
+
+	switch( state )
+	{
+	case States.timer:
+		if ( now > alarmTime )
+		{
+		//sound alarm
+		//flash 
+		}
+		break;
+		
+	case States.exercise:
+		transistion++;
+		// has exercise held for long enough?
+		if ( now > exerTime )
+		{
+			if ( position < numExer )
+			{
+				//next exercise
+				position++;
+				setExer();
+			}
+			else
+			{
+				// finished exercises
+				position = 0;
+				
+				if ( repCount < numReps )
+				{
+					repCount++;
+					setExer();
+				}
+				else
+				{
+					setTimer();
+				}
+			}
+		}
+		break;
+	}
+	
+	drawClock(now)
+}
+
+function drawClock(now) {
+  const grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
+  grad.addColorStop(0, '#333');
+  grad.addColorStop(0.5, 'white');
+  grad.addColorStop(1, '#333');
+  
+  drawFace(ctx, radius, grad);
+  
+  if ( exerOn )
+  {
+	drawExerciseShape(ctx, radius);
+  }
+  
+  drawState(ctx, radius);
+  drawTics(ctx, radius);
+  if ( alarmOn )
+  {
+	drawAlarmHour(ctx, radius, alarmTime);
+  }
+  if ( exerOn )
+  {
+	drawExerciseSec(ctx, radius, exerTime, now);
+  }
+  else
+  {
+	drawNumbers(ctx, radius);
+	drawTime(ctx, radius, now, grad);
+  }
+  drawHub(ctx, radius);
+  //mySound.play();
+}
+
+function drawFace(ctx, radius, grad) {
+
+  // Shadow
+  ctx.shadowColor = "#0000007f";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 3;
+  
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, 2*Math.PI);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = radius*0.1;
+  ctx.stroke();
+
+  // Shadow
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  
+  ctx.fillStyle = '#333';
+}
+
+function drawHub(ctx, radius) {
+  // Shadow
+  ctx.shadowColor = "#0000007f";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 6;
+  ctx.shadowOffsetY = 6;
+  ctx.fillStyle = '#333';
+  
+  ctx.beginPath();
+  ctx.arc(0, 0, radius*0.07, 0, 2*Math.PI);
+  ctx.fill();
+
+  // Shadow
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+}
+
+function drawState(ctx, radius) {
+  const text = ["Sleep", "Exercise", "Timer", "Alarm", "Pause"];
+
+  ctx.fillStyle = 'green';
+  ctx.font = radius*0.15 + "px arial";
+  ctx.textBaseline="middle";
+  ctx.textAlign="center";
+  ctx.fillText(text[state],radius*0.5,0);
+  if ( state == States.exercise )
+  {
+	ctx.fillText(position+1,radius*0.5,radius*0.2); 
+	ctx.fillText("Rep",radius*0.5,radius*0.4);
+	ctx.fillText(repCount+1,radius*0.5,radius*0.6);
+  }
+}
+
+function drawNumbers(ctx, radius) {
+  const roman = ["I", "II", "III", "IIII", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+  ctx.font = radius*0.15 + "px arial";
+  ctx.textBaseline="middle";
+  ctx.textAlign="center";
+  ctx.fillStyle = '#333';
+
+  // Shadow
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+ 
+  for(let num = 1; num < 13; num++){
+    let ang = num * Math.PI / 6;
+    ctx.rotate(ang);
+    ctx.translate(0, -radius*0.80);
+    ctx.fillText(roman[num-1],0,0);
+    ctx.translate(0, radius*0.80);
+    ctx.rotate(-ang);
+  }
+}
+
+function drawTics(ctx, radius) {
+  ctx.fillStyle = '#333';
+
+  for(let num = 0; num < 60; num++){
+    let ang = num * Math.PI / 30;
+    if ( num % 5 == 0 )
+    	drawHand(ctx, ang, radius*0.9, radius*0.95, radius*0.02);
+    else
+    	drawHand(ctx, ang, radius*0.92, radius*0.95, radius*0.005);
+  }
+}
+
+function drawAlarmHour(ctx, radius, time){
+    let hour = time.getHours();
+    let minute = time.getMinutes();
+    let second = time.getSeconds();
+    
+	ctx.strokeStyle = 'red';
+	
+    // Shadow
+    ctx.shadowColor = "#700000cf";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+
+    //hour
+	hour=hour%12;
+    hour=(hour*Math.PI/6)+
+    (minute*Math.PI/(6*60))+
+    (second*Math.PI/(360*60));
+    drawHand(ctx, hour, 0, radius*0.5, radius*0.03);
+}
+
+function drawExerciseSec(ctx, radius, time, now){
+    
+	ctx.strokeStyle = 'red';
+	
+    // Shadow
+    ctx.shadowColor = "#700000cf";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+    
+    // exercise second
+    let second = time.getSeconds();
+	ctx.strokeStyle = 'red';
+    second=(second*Math.PI/30);
+    drawHand(ctx, second, 0, radius*0.9, radius*0.02);
+
+    // Shadow
+	ctx.fillStyle = '#333';
+	ctx.shadowColor = "black";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+
+    // time second
+	ctx.strokeStyle = 'black';
+	second = now.getSeconds();
+    second=(second*Math.PI/30);
+    drawHand(ctx, second, 0, radius*0.9, radius*0.02);
+}
+
+function drawExerciseShape(ctx, radius)
+{
+	let angle  = [0, 0, 0, 0];
+	let width  = [0.20, 0.16, 0.14, 0.12];
+	let length = [0.80, 0.40, 0.30, 0.20];
+  
+	switch ( position )
+	{
+	case 0:
+		break;
+	case 1:
+		angle[0] = 0;
+		angle[1] = -0.5*Math.PI;
+		angle[2] = -0.5*Math.PI;
+		angle[3] = -0.5*Math.PI;
+		break;
+	case 2:
+		angle[0] = 0;
+		angle[1] = -0.5*Math.PI;
+		angle[2] = -1.0*Math.PI;
+		angle[3] = -1.0*Math.PI;
+		break;
+	case 3:
+		angle[0] = 0;
+		angle[1] = -0.5*Math.PI;
+		angle[2] = -1.0*Math.PI;
+		angle[3] = -1.5*Math.PI;
+		break;
+	case 4:
+		angle[0] = 0;
+		angle[1] = 0;
+		angle[2] = -0.5*Math.PI;
+		angle[3] = -1.0*Math.PI;
+		break;
+	}
+	
+	ctx.lineCap     = "round";
+	ctx.strokeStyle = '#777';	
+	
+	let x = 0;
+	let y = radius*length[0];
+	
+	for(let i = 0; i < 4; i++){
+	
+		ctx.beginPath();
+		ctx.lineWidth = radius*width[i];
+		ctx.moveTo(x, y);
+		
+
+		x += radius*length[i] * Math.sin(angle[i]);
+		y -= radius*length[i] * Math.cos(angle[i]);
+		ctx.lineTo(x, y);
+		ctx.stroke();
+	}
+}
+
+function drawTime(ctx, radius, now, grad){
+    let hour = now.getHours();
+    let minute = now.getMinutes();
+    let second = now.getSeconds();
+
+	ctx.fillStyle = '#333';
+    ctx.strokeStyle = grad;
+  
+    // Shadow
+    ctx.shadowColor = "#000000cf";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+
+    //hour
+    hour=hour%12;
+    hour=(hour*Math.PI/6)+
+    (minute*Math.PI/(6*60))+
+    (second*Math.PI/(360*60));
+    drawHand(ctx, hour, 0, radius*0.5, radius*0.07);
+    
+    //minute
+    minute=(minute*Math.PI/30)+(second*Math.PI/(30*60));
+    drawHand(ctx, minute, 0, radius*0.8, radius*0.07);
+
+    // second
+    second=(second*Math.PI/30);
+    drawHand(ctx, second, 0, radius*0.9, radius*0.02);
+
+    // Shadow
+	ctx.fillStyle = '#333';
+	ctx.shadowColor = "black";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+}
+
+function drawHand(ctx, pos, inner, outer, width, shadow) {
+    ctx.beginPath();
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.rotate(pos);
+    ctx.moveTo(0, -inner);
+    ctx.lineTo(0, -outer);
+    ctx.stroke();
+    ctx.rotate(-pos);
+}
+</script>
+
+</body>
+</html>
