@@ -1,14 +1,5 @@
 <!DOCTYPE html>
 <html>
-<head>
-<link href='https://fonts.googleapis.com/css?family=Tourney' rel='stylesheet'>
-<!--
-<style>
-  body {
-      font-family: 'Tourney';font-size: 22px;
-  }
-</style>-->
-</head>
 <body>
 
 <canvas id="canvas" width="600" height="600"
@@ -222,55 +213,24 @@ function drawHub(ctx, radius) {
 }
 
 function drawState(ctx, radius) {
-  let x = 0;
+  let x = 0, y=0;
   
-  for ( pass = 0; pass < 5; pass++)
-  {
-    switch ( pass )
-    {
-    case 0:
-      x = -1;
-      y = -1;
-      ctx.fillStyle = 'black';
-      break;
-    case 1:
-      x = 1;
-      y = -1;
-      ctx.fillStyle = 'black';
-      break;
-    case 2:
-      x = -1;
-      y = 1;
-      ctx.fillStyle = 'black';
-      break;
-    case 3:
-      x = 1;
-      y = 1;
-      ctx.fillStyle = 'black';
-      break;
-    case 4:
-      x = 0;
-      ctx.fillStyle = 'white';
-      break;
-    }
-  //ctx.fillStyle = 'green';
-  //ctx.font = radius*0.20 + "px Tourney";
-  ctx.font = radius*0.20 + "px arial, sans-serif bold";
+  ctx.font = "60px Arial, san serif bold";
   ctx.textBaseline="middle";
   ctx.textAlign="centre";
 
-  // Shadow
-  //ctx.shadowColor = "white";
-  //ctx.shadowBlur = 1;
-  //ctx.shadowOffsetX = 0;
-  //ctx.shadowOffsetY = 0;
+  ctx.fillStyle = "#3f3";
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
 
   switch ( state )
   {
   case States.sleep:
   case States.alarm:
     ctx.fillText("Click to start",x,y+radius*-0.2);
+    ctx.strokeText("Click to start",x,y+radius*-0.2);
     ctx.fillText("exercises",x,y);
+    ctx.strokeText("exercises",x,y);
     break;
   case States.timer:
     {
@@ -278,8 +238,11 @@ function drawState(ctx, radius) {
         const minutes = alarmTime.getMinutes();
         const dueTimeText = hours.toString() + ":" + minutes.toString();
         ctx.fillText("Next exercise",x,y+radius*-0.2);
+        ctx.strokeText("Next exercise",x,y+radius*-0.2);
         ctx.fillText("due at ",x,y);
+        ctx.strokeText("due at ",x,y);
         ctx.fillText(dueTimeText,x,y+radius*0.2);
+        ctx.strokeText(dueTimeText,x,y+radius*0.2);
     }
     break;
   case States.exercise:
@@ -289,16 +252,21 @@ function drawState(ctx, radius) {
       const holdText = repetition.toString() + " of " + numReps.toString();
 
       ctx.fillText("Hold",x,y+radius*-0.2);
+      ctx.strokeText("Hold",x,y+radius*-0.2);
       ctx.fillText(positionText,x,y);
+      ctx.strokeText(positionText,x,y);
       ctx.fillText(repText,x,y+radius*0.2); 
+      ctx.strokeText(repText,x,y+radius*0.2); 
     }
     break;
   case States.pause:
     ctx.fillText("Paused",x,radius*-0.2);
+    ctx.strokeText("Paused",x,radius*-0.2);
     ctx.fillText("Click to",x,0);
+    ctx.strokeText("Click to",x,0);
     ctx.fillText("restart",x,radius*0.2);
+    ctx.strokeText("restart",x,radius*0.2);
     break;
-  }
   }
 }
 
