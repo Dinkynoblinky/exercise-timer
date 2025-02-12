@@ -2,7 +2,7 @@
 <html>
 <head>
 <link href='https://fonts.googleapis.com/css?family=Tourney' rel='stylesheet'>
-<!----
+<!--
 <style>
   body {
       font-family: 'Tourney';font-size: 22px;
@@ -46,24 +46,6 @@ radius *= 0.90;
 
 setInterval(onTick, 1000);
 
-/*
-var mySound = new sound("bounce.mp3");
-
-function sound(src) {
-    this.sound = document.createElement("audio");
-    this.sound.src = src;
-    this.sound.setAttribute("preload", "auto");
-    this.sound.setAttribute("controls", "none");
-    this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
-    this.play = function(){
-        this.sound.play();
-    }
-    this.stop = function(){
-        this.sound.pause();
-    }    
-}
-*/
 
 function setFirstExercise() {
   position = 1;
@@ -240,35 +222,64 @@ function drawHub(ctx, radius) {
 }
 
 function drawState(ctx, radius) {
-  //const x = radius*0.2;
-  const x = 0;
-
-  ctx.fillStyle = 'green';
-  ctx.font = radius*0.20 + "px Tourney";
+  let x = 0;
+  
+  for ( pass = 0; pass < 5; pass++)
+  {
+    switch ( pass )
+    {
+    case 0:
+      x = -1;
+      y = -1;
+      ctx.fillStyle = 'black';
+      break;
+    case 1:
+      x = 1;
+      y = -1;
+      ctx.fillStyle = 'black';
+      break;
+    case 2:
+      x = -1;
+      y = 1;
+      ctx.fillStyle = 'black';
+      break;
+    case 3:
+      x = 1;
+      y = 1;
+      ctx.fillStyle = 'black';
+      break;
+    case 4:
+      x = 0;
+      ctx.fillStyle = 'white';
+      break;
+    }
+  //ctx.fillStyle = 'green';
+  //ctx.font = radius*0.20 + "px Tourney";
+  ctx.font = radius*0.20 + "px arial, sans-serif bold";
   ctx.textBaseline="middle";
   ctx.textAlign="centre";
 
   // Shadow
-  ctx.shadowColor = "white";
-  ctx.shadowBlur = 1;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
+  //ctx.shadowColor = "white";
+  //ctx.shadowBlur = 1;
+  //ctx.shadowOffsetX = 0;
+  //ctx.shadowOffsetY = 0;
 
   switch ( state )
   {
   case States.sleep:
   case States.alarm:
-    ctx.fillText("Click to start",x,radius*-0.2);
-    ctx.fillText("exercises",x,0);
+    ctx.fillText("Click to start",x,y+radius*-0.2);
+    ctx.fillText("exercises",x,y);
     break;
   case States.timer:
     {
         const hours = alarmTime.getHours();
         const minutes = alarmTime.getMinutes();
         const dueTimeText = hours.toString() + ":" + minutes.toString();
-        ctx.fillText("Next exercise",x,radius*-0.2);
-        ctx.fillText("due at ",x,0);
-        ctx.fillText(dueTimeText,x,radius*0.2);
+        ctx.fillText("Next exercise",x,y+radius*-0.2);
+        ctx.fillText("due at ",x,y);
+        ctx.fillText(dueTimeText,x,y+radius*0.2);
     }
     break;
   case States.exercise:
@@ -277,9 +288,9 @@ function drawState(ctx, radius) {
       const repText = "Rep " + repetition.toString() + " of " + numReps.toString();
       const holdText = repetition.toString() + " of " + numReps.toString();
 
-      ctx.fillText("Hold",x,radius*-0.2);
-      ctx.fillText(positionText,x,0);
-      ctx.fillText(repText,x,radius*0.2); 
+      ctx.fillText("Hold",x,y+radius*-0.2);
+      ctx.fillText(positionText,x,y);
+      ctx.fillText(repText,x,y+radius*0.2); 
     }
     break;
   case States.pause:
@@ -287,6 +298,7 @@ function drawState(ctx, radius) {
     ctx.fillText("Click to",x,0);
     ctx.fillText("restart",x,radius*0.2);
     break;
+  }
   }
 }
 
