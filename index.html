@@ -214,8 +214,9 @@ function drawHub(ctx, radius) {
 
 function drawState(ctx, radius) {
   let x = 0, y=0;
+  const dy = radius*0.25;
   
-  ctx.font = "60px Arial, san serif bold";
+  ctx.font = radius*0.25 + "px Arial, san serif bold";
   ctx.textBaseline="middle";
   ctx.textAlign="centre";
 
@@ -227,8 +228,10 @@ function drawState(ctx, radius) {
   {
   case States.sleep:
   case States.alarm:
-    ctx.fillText("Click to start",x,y+radius*-0.2);
-    ctx.strokeText("Click to start",x,y+radius*-0.2);
+    y -= dy * 0.5 ;
+    ctx.fillText("Click to start",x,y);
+    ctx.strokeText("Click to start",x,y);
+    y += dy;
     ctx.fillText("exercises",x,y);
     ctx.strokeText("exercises",x,y);
     break;
@@ -237,12 +240,15 @@ function drawState(ctx, radius) {
         const hours = alarmTime.getHours();
         const minutes = alarmTime.getMinutes();
         const dueTimeText = hours.toString() + ":" + minutes.toString();
-        ctx.fillText("Next exercise",x,y+radius*-0.2);
-        ctx.strokeText("Next exercise",x,y+radius*-0.2);
+        y -= dy;
+        ctx.fillText("Next exercise",x,y);
+        ctx.strokeText("Next exercise",x,y);
+        y += dy;
         ctx.fillText("due at ",x,y);
         ctx.strokeText("due at ",x,y);
-        ctx.fillText(dueTimeText,x,y+radius*0.2);
-        ctx.strokeText(dueTimeText,x,y+radius*0.2);
+        y += dy;
+        ctx.fillText(dueTimeText,x,y);
+        ctx.strokeText(dueTimeText,x,y);
     }
     break;
   case States.exercise:
@@ -251,21 +257,27 @@ function drawState(ctx, radius) {
       const repText = "Rep " + repetition.toString() + " of " + numReps.toString();
       const holdText = repetition.toString() + " of " + numReps.toString();
 
-      ctx.fillText("Hold",x,y+radius*-0.2);
-      ctx.strokeText("Hold",x,y+radius*-0.2);
+      y -= dy;
+      ctx.fillText("Hold",x,y);
+      ctx.strokeText("Hold",x,y);
+      y += dy;
       ctx.fillText(positionText,x,y);
       ctx.strokeText(positionText,x,y);
-      ctx.fillText(repText,x,y+radius*0.2); 
-      ctx.strokeText(repText,x,y+radius*0.2); 
+      y += dy;
+      ctx.fillText(repText,x,y); 
+      ctx.strokeText(repText,x,y); 
     }
     break;
   case States.pause:
-    ctx.fillText("Paused",x,radius*-0.2);
-    ctx.strokeText("Paused",x,radius*-0.2);
-    ctx.fillText("Click to",x,0);
-    ctx.strokeText("Click to",x,0);
-    ctx.fillText("restart",x,radius*0.2);
-    ctx.strokeText("restart",x,radius*0.2);
+    y -= dy;
+    ctx.fillText("Paused",x,y);
+    ctx.strokeText("Paused",x,y);
+    y += dy;
+    ctx.fillText("Click to",x,y);
+    ctx.strokeText("Click to",x,y);
+    y += dy;
+    ctx.fillText("restart",x,y);
+    ctx.strokeText("restart",x,y);
     break;
   }
 }
